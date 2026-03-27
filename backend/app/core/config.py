@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     access_token_expire_days: int = 7
     deepl_api_key: str = ""
     mymemory_email: str = ""
+    allowed_origins: str = "http://localhost:5173"
 
     model_config = {"env_file": ".env"}
 

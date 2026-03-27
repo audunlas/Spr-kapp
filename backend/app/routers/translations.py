@@ -24,7 +24,8 @@ async def translate(
         translated_text, alternatives, cached = await service.translate(
             body.text, body.source_lang, body.target_lang
         )
-    except Exception:
+    except Exception as e:
+        print(f"Translation error: {type(e).__name__}: {e}")
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Translation service unavailable",

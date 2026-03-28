@@ -1,3 +1,5 @@
+import asyncio
+
 import httpx
 from sqlalchemy.orm import Session
 
@@ -100,3 +102,26 @@ class TranslationService:
                 break
 
         return primary, alternatives
+
+
+async def translate_pages(
+    texts: list[str], source_lang: str, target_lang: str
+) -> list[str]:
+    """Translate a list of page texts via DeepL in parallel. Falls back to originals on error."""
+    if not settings.deepl_api_key or source_lang == target_lang:
+        return texts
+
+    async def _one(text: str) -> str:
+        headers = {"Authorization": f"DeepL-Auth-Key {settings.deepl_api_key}"}
+        payload = {
+            "text": [text],
+            "source_lang": _deepl_lang(source_lang),
+            "target_lang": _deepl_lang(target_lang),
+        }
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            r = await client.post(DEEPL_URL, json=payload, headers=headers)
+            r.raise_for_status()
+            return r.json().get("translations", [{}])[0].get("text", text)
+
+    results = await asyncio.gather(*[_one(t) for t in texts], return_exceptions=True)
+    return [r if isinstance(r, str) else texts[i] for i, r in enumerate(results)]

@@ -1,6 +1,6 @@
 import { type ChangeEvent, type FormEvent, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { languageName } from "../../constants/languages";
+import { LANGUAGES, languageName } from "../../constants/languages";
 import { uploadDocument, createTextDocument } from "../../api/documents";
 
 type Tab = "pdf" | "text";
@@ -9,6 +9,7 @@ export function UploadPage() {
   const { lang } = useParams<{ lang: string }>();
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>("pdf");
+  const [sourceLang, setSourceLang] = useState(lang ?? "es");
 
   // PDF state
   const [file, setFile] = useState<File | null>(null);
@@ -33,7 +34,8 @@ export function UploadPage() {
     setIsUploading(true);
     setError(null);
     try {
-      const doc = await uploadDocument(file, lang);
+      const needsTranslation = sourceLang !== lang;
+      const doc = await uploadDocument(file, lang, needsTranslation ? sourceLang : undefined);
       navigate(`/read/${doc.id}`);
     } catch (err: unknown) {
       const detail =
@@ -52,7 +54,13 @@ export function UploadPage() {
     setIsUploading(true);
     setError(null);
     try {
-      const doc = await createTextDocument(textTitle.trim(), textContent.trim(), lang);
+      const needsTranslation = sourceLang !== lang;
+      const doc = await createTextDocument(
+        textTitle.trim(),
+        textContent.trim(),
+        lang,
+        needsTranslation ? sourceLang : undefined,
+      );
       navigate(`/read/${doc.id}`);
     } catch (err: unknown) {
       const detail =
@@ -63,6 +71,24 @@ export function UploadPage() {
       setIsUploading(false);
     }
   }
+
+  const langSelect = (
+    <div className="field">
+      <label htmlFor="source_lang">Document language</label>
+      <select
+        id="source_lang"
+        value={sourceLang}
+        onChange={(e) => setSourceLang(e.target.value)}
+      >
+        {LANGUAGES.map((l) => (
+          <option key={l.code} value={l.code}>{l.name}</option>
+        ))}
+      </select>
+      {sourceLang !== lang && (
+        <p className="field-hint">Will be translated into {languageName(lang ?? "")}</p>
+      )}
+    </div>
+  );
 
   return (
     <div className="upload-page">
@@ -87,49 +113,53 @@ export function UploadPage() {
 
       {tab === "pdf" ? (
         <form onSubmit={handlePdfSubmit}>
-          <label>
-            Select a PDF file
+          {langSelect}
+          <div className="field">
+            <label>Select a PDF file</label>
             <input
               type="file"
               accept=".pdf,application/pdf"
               onChange={handleFileChange}
               required
             />
-          </label>
+          </div>
           {error && <p className="error">{error}</p>}
           <button type="submit" disabled={!file || isUploading} className="btn-primary">
-            {isUploading ? "Uploading…" : "Upload"}
+            {isUploading ? (sourceLang !== lang ? "Translating & uploading…" : "Uploading…") : "Upload"}
           </button>
         </form>
       ) : (
         <form onSubmit={handleTextSubmit}>
-          <label>
-            Title
+          {langSelect}
+          <div className="field">
+            <label htmlFor="text_title">Title</label>
             <input
+              id="text_title"
               type="text"
               value={textTitle}
               onChange={(e) => setTextTitle(e.target.value)}
               placeholder="Document title"
               required
             />
-          </label>
-          <label>
-            Text content
+          </div>
+          <div className="field">
+            <label htmlFor="text_content">Text content</label>
             <textarea
+              id="text_content"
               value={textContent}
               onChange={(e) => setTextContent(e.target.value)}
               placeholder="Paste your text here…"
               rows={12}
               required
             />
-          </label>
+          </div>
           {error && <p className="error">{error}</p>}
           <button
             type="submit"
             disabled={!textTitle.trim() || !textContent.trim() || isUploading}
             className="btn-primary"
           >
-            {isUploading ? "Creating…" : "Create document"}
+            {isUploading ? (sourceLang !== lang ? "Translating…" : "Creating…") : "Create document"}
           </button>
         </form>
       )}

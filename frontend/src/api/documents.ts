@@ -22,10 +22,15 @@ export async function getDocuments(targetLanguage?: string): Promise<Document[]>
   return res.data;
 }
 
-export async function uploadDocument(file: File, targetLanguage: string): Promise<Document> {
+export async function uploadDocument(
+  file: File,
+  targetLanguage: string,
+  sourceLanguage?: string,
+): Promise<Document> {
   const form = new FormData();
   form.append("file", file);
   form.append("target_language", targetLanguage);
+  if (sourceLanguage) form.append("source_language", sourceLanguage);
   const res = await apiClient.post<Document>("/documents/upload", form, {
     headers: { "Content-Type": undefined },
   });
@@ -50,11 +55,13 @@ export async function createTextDocument(
   title: string,
   content: string,
   targetLanguage: string,
+  sourceLanguage?: string,
 ): Promise<Document> {
   const res = await apiClient.post<Document>("/documents/text", {
     title,
     content,
     target_language: targetLanguage,
+    source_language: sourceLanguage ?? "",
   });
   return res.data;
 }

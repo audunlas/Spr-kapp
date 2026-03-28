@@ -7,6 +7,7 @@ from app.models.user import User
 from app.routers.auth import get_current_user
 from app.schemas.document import DocumentOut, PageOut, TextDocumentRequest
 from app.services.pdf_parser import PDFParser
+from app.services.translation import translate_pages
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
@@ -36,6 +37,7 @@ def list_documents(
 async def upload_document(
     file: UploadFile,
     target_language: str = Form(default="es"),
+    source_language: str = Form(default=""),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -51,6 +53,12 @@ async def upload_document(
         title = title[:-4]
     # Replace filename separators with spaces for a readable title
     title = title.replace("-", " ").replace("_", " ").strip()
+
+    src = source_language.strip() or target_language
+    if src != target_language:
+        texts = await translate_pages([p["text_content"] for p in raw_pages], src, target_language)
+        for p, t in zip(raw_pages, texts):
+            p["text_content"] = t
 
     doc = Document(
         owner_id=current_user.id,
@@ -71,7 +79,7 @@ async def upload_document(
 
 
 @router.post("/text", response_model=DocumentOut, status_code=status.HTTP_201_CREATED)
-def create_text_document(
+async def create_text_document(
     body: TextDocumentRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -98,6 +106,10 @@ def create_text_document(
 
     if not pages_text:
         pages_text = [""]
+
+    src = body.source_language.strip() or body.target_language
+    if src != body.target_language:
+        pages_text = await translate_pages(pages_text, src, body.target_language)
 
     doc = Document(
         owner_id=current_user.id,

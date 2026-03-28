@@ -8,6 +8,7 @@ class TextDocumentRequest(BaseModel):
     title: str
     content: str
     target_language: str = "es"
+    source_language: str = ""
 
 
 class DocumentOut(BaseModel):

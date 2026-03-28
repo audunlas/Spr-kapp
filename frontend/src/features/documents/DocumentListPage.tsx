@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { languageName } from "../../constants/languages";
-import { deleteDocument, getDocuments, type Document } from "../../api/documents";
+import { deleteDocument, getDocuments, seedLanguage, type Document } from "../../api/documents";
 
 export function DocumentListPage() {
   const { lang } = useParams<{ lang: string }>();
@@ -9,8 +9,15 @@ export function DocumentListPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    if (!lang) return;
     setIsLoading(true);
-    getDocuments(lang)
+    const seedKey = `seeded_${lang}`;
+    const alreadySeeded = localStorage.getItem(seedKey);
+    (alreadySeeded ? Promise.resolve() : seedLanguage(lang).catch(() => {}))
+      .then(() => {
+        if (!alreadySeeded) localStorage.setItem(seedKey, "1");
+        return getDocuments(lang);
+      })
       .then(setDocuments)
       .finally(() => setIsLoading(false));
   }, [lang]);

@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.core.database import create_tables
-from app.routers import auth, documents, translations, vocab
+from app.routers import auth, documents, seeding, translations, vocab
 
 
 @asynccontextmanager
@@ -33,6 +33,7 @@ app.include_router(auth.router)
 app.include_router(documents.router)
 app.include_router(translations.router)
 app.include_router(vocab.router)
+app.include_router(seeding.router)
 
 
 @app.get("/health")

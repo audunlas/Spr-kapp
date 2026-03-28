@@ -56,6 +56,10 @@ export const handlers = [
     });
   }),
 
+  http.post(`${BASE}/seed`, () =>
+    HttpResponse.json({ document_created: true, vocab_created: true })
+  ),
+
   // Vocab handlers
   http.get(`${BASE}/vocab/lists`, () =>
     HttpResponse.json([

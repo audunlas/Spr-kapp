@@ -46,6 +46,10 @@ export async function deleteDocument(id: number): Promise<void> {
   await apiClient.delete(`/documents/${id}`);
 }
 
+export async function seedLanguage(targetLanguage: string): Promise<void> {
+  await apiClient.post(`/seed?target_language=${encodeURIComponent(targetLanguage)}`);
+}
+
 export async function getPage(documentId: number, pageNumber: number): Promise<Page> {
   const res = await apiClient.get<Page>(`/documents/${documentId}/pages/${pageNumber}`);
   return res.data;

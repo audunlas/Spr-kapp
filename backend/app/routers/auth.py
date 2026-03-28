@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.security import create_access_token, decode_token, hash_password, verify_password
 from app.models.user import User
-from app.schemas.auth import LoginRequest, RegisterRequest, TokenResponse, UserOut
+from app.schemas.auth import LoginRequest, RegisterRequest, TokenResponse, UpdateSettingsRequest, UserOut
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -33,6 +33,7 @@ def register(body: RegisterRequest, db: Session = Depends(get_db)):
         username=body.username,
         email=body.email,
         hashed_password=hash_password(body.password),
+        native_language=body.native_language,
     )
     db.add(user)
     db.commit()
@@ -51,4 +52,16 @@ def login(body: LoginRequest, db: Session = Depends(get_db)):
 
 @router.get("/me", response_model=UserOut)
 def me(current_user: User = Depends(get_current_user)):
+    return current_user
+
+
+@router.patch("/settings", response_model=UserOut)
+def update_settings(
+    body: UpdateSettingsRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    current_user.native_language = body.native_language
+    db.commit()
+    db.refresh(current_user)
     return current_user

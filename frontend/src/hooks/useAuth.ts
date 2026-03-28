@@ -24,8 +24,13 @@ export function useAuth() {
     setUser(me);
   }, []);
 
-  const register = useCallback(async (username: string, password: string, email?: string) => {
-    await apiRegister(username, password, email);
+  const register = useCallback(async (
+    username: string,
+    password: string,
+    nativeLanguage: string,
+    email?: string,
+  ) => {
+    await apiRegister(username, password, nativeLanguage, email);
     await login(username, password);
   }, [login]);
 
@@ -34,5 +39,5 @@ export function useAuth() {
     setUser(null);
   }, []);
 
-  return { user, isLoading, login, register, logout };
+  return { user, setUser, isLoading, login, register, logout };
 }

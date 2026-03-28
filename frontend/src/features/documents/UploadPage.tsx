@@ -1,8 +1,10 @@
 import { type ChangeEvent, type FormEvent, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { languageName } from "../../constants/languages";
 import { uploadDocument } from "../../api/documents";
 
 export function UploadPage() {
+  const { lang } = useParams<{ lang: string }>();
   const navigate = useNavigate();
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -16,12 +18,12 @@ export function UploadPage() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!file) return;
+    if (!file || !lang) return;
 
     setIsUploading(true);
     setError(null);
     try {
-      const doc = await uploadDocument(file);
+      const doc = await uploadDocument(file, lang);
       navigate(`/read/${doc.id}`);
     } catch (err: unknown) {
       const detail =
@@ -35,7 +37,7 @@ export function UploadPage() {
 
   return (
     <div className="upload-page">
-      <h1>Upload PDF</h1>
+      <h1>Upload PDF — {languageName(lang ?? "")}</h1>
       <form onSubmit={handleSubmit}>
         <label>
           Select a PDF file

@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { languageName } from "../../constants/languages";
 import { deleteDocument, getDocuments, type Document } from "../../api/documents";
 
 export function DocumentListPage() {
+  const { lang } = useParams<{ lang: string }>();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    getDocuments()
+    setIsLoading(true);
+    getDocuments(lang)
       .then(setDocuments)
       .finally(() => setIsLoading(false));
-  }, []);
+  }, [lang]);
 
   async function handleDelete(id: number) {
     await deleteDocument(id);
@@ -22,13 +25,13 @@ export function DocumentListPage() {
   return (
     <div className="document-list-page">
       <div className="page-top">
-        <h1>My Documents</h1>
-        <Link to="/upload" className="btn-primary">Upload PDF</Link>
+        <h1>{languageName(lang ?? "")}</h1>
+        <Link to={`/learn/${lang}/upload`} className="btn-primary">Upload PDF</Link>
       </div>
       {documents.length === 0 ? (
         <div className="empty-state">
           <p>No documents yet.</p>
-          <Link to="/upload" className="btn-primary">Upload your first PDF</Link>
+          <Link to={`/learn/${lang}/upload`} className="btn-primary">Upload your first PDF</Link>
         </div>
       ) : (
         <ul className="doc-list">

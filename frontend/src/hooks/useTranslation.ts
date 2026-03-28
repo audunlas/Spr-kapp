@@ -13,9 +13,13 @@ export function useTranslation() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const translateText = useCallback(async (text: string): Promise<TranslationResult | null> => {
-    const key = text.trim().toLowerCase();
-    if (!key) return null;
+  const translateText = useCallback(async (
+    text: string,
+    sourceLang: string,
+    targetLang: string,
+  ): Promise<TranslationResult | null> => {
+    const key = `${sourceLang}:${targetLang}:${text.trim().toLowerCase()}`;
+    if (!text.trim()) return null;
 
     const cached = cache.current.get(key);
     if (cached !== undefined) return cached;
@@ -23,8 +27,7 @@ export function useTranslation() {
     setIsLoading(true);
     setError(null);
     try {
-      const result = await translate(text);
-      // Evict oldest entry if at capacity
+      const result = await translate(text, sourceLang, targetLang);
       if (cache.current.size >= LRU_MAX) {
         const firstKey = cache.current.keys().next().value!;
         cache.current.delete(firstKey);

@@ -12,6 +12,7 @@ class Document(Base):
     id = Column(Integer, primary_key=True, index=True)
     owner_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     title = Column(String, nullable=False)
+    target_language = Column(String, nullable=False, default="es", server_default="es")
     original_filename = Column(String)
     page_count = Column(Integer, default=0)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, Form, HTTPException, Query, UploadFile, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -22,15 +22,20 @@ def _get_owned_document(document_id: int, current_user: User, db: Session) -> Do
 
 @router.get("", response_model=list[DocumentOut])
 def list_documents(
+    target_language: str | None = Query(None),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    return db.query(Document).filter(Document.owner_id == current_user.id).all()
+    q = db.query(Document).filter(Document.owner_id == current_user.id)
+    if target_language:
+        q = q.filter(Document.target_language == target_language)
+    return q.all()
 
 
 @router.post("/upload", response_model=DocumentOut, status_code=status.HTTP_201_CREATED)
 async def upload_document(
     file: UploadFile,
+    target_language: str = Form(default="es"),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -50,6 +55,7 @@ async def upload_document(
     doc = Document(
         owner_id=current_user.id,
         title=title,
+        target_language=target_language,
         original_filename=file.filename,
         page_count=len(raw_pages),
     )

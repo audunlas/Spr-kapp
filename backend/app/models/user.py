@@ -13,6 +13,7 @@ class User(Base):
     username = Column(String, unique=True, nullable=False, index=True)
     email = Column(String, unique=True, nullable=True)
     hashed_password = Column(String, nullable=False)
+    native_language = Column(String, nullable=False, default="en", server_default="en")
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     documents = relationship("Document", back_populates="owner", cascade="all, delete-orphan")

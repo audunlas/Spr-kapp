@@ -3,6 +3,7 @@ import { apiClient } from "./client";
 export interface Document {
   id: number;
   title: string;
+  target_language: string;
   original_filename: string | null;
   page_count: number;
   created_at: string;
@@ -14,16 +15,17 @@ export interface Page {
   document_id: number;
 }
 
-export async function getDocuments(): Promise<Document[]> {
-  const res = await apiClient.get<Document[]>("/documents");
+export async function getDocuments(targetLanguage?: string): Promise<Document[]> {
+  const res = await apiClient.get<Document[]>("/documents", {
+    params: targetLanguage ? { target_language: targetLanguage } : {},
+  });
   return res.data;
 }
 
-export async function uploadDocument(file: File): Promise<Document> {
+export async function uploadDocument(file: File, targetLanguage: string): Promise<Document> {
   const form = new FormData();
   form.append("file", file);
-  // Clear the default Content-Type so axios can set multipart/form-data
-  // with the correct boundary automatically when given a FormData body.
+  form.append("target_language", targetLanguage);
   const res = await apiClient.post<Document>("/documents/upload", form, {
     headers: { "Content-Type": undefined },
   });

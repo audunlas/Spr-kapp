@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getDocument, getPage, type Document, type Page } from "../../api/documents";
+import { useAuthContext } from "../auth/AuthContext";
 import { useTranslation } from "../../hooks/useTranslation";
 import { SelectionHandler } from "./SelectionHandler";
 import { TextRenderer } from "./TextRenderer";
@@ -14,6 +15,7 @@ interface PanelState {
 
 export function ReaderPage() {
   const { documentId } = useParams<{ documentId: string }>();
+  const { user } = useAuthContext();
   const [document, setDocument] = useState<Document | null>(null);
   const [page, setPage] = useState<Page | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -36,8 +38,10 @@ export function ReaderPage() {
   }, [documentId, currentPage]);
 
   async function showTranslation(text: string) {
+    const sourceLang = document?.target_language ?? "es";
+    const targetLang = user?.native_language ?? "en";
     setPanel({ sourceText: text, translation: null, alternatives: [] });
-    const result = await translateText(text);
+    const result = await translateText(text, sourceLang, targetLang);
     setPanel((prev) =>
       prev
         ? { ...prev, translation: result?.translation ?? null, alternatives: result?.alternatives ?? [] }
@@ -47,11 +51,13 @@ export function ReaderPage() {
 
   if (isLoading && !page) return <div className="loading">Loading document…</div>;
 
+  const backLang = document?.target_language ?? "es";
+
   return (
     <div className="reader-page">
       <div className="reader-main">
         <div className="reader-header">
-          <Link to="/" className="back-link">← My Documents</Link>
+          <Link to={`/learn/${backLang}`} className="back-link">← My Documents</Link>
           {document && <h1 className="reader-title">{document.title}</h1>}
           {document && (
             <div className="page-nav">

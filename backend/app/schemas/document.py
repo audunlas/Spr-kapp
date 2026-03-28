@@ -7,6 +7,7 @@ from pydantic import BaseModel
 class DocumentOut(BaseModel):
     id: int
     title: str
+    target_language: str
     original_filename: Optional[str]
     page_count: int
     created_at: datetime

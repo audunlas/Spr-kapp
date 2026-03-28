@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./features/auth/AuthContext";
 import { LoginPage } from "./features/auth/LoginPage";
 import { RegisterPage } from "./features/auth/RegisterPage";
@@ -7,6 +7,7 @@ import { Layout } from "./components/Layout";
 import { DocumentListPage } from "./features/documents/DocumentListPage";
 import { UploadPage } from "./features/documents/UploadPage";
 import { ReaderPage } from "./features/reader/ReaderPage";
+import { SettingsPage } from "./features/settings/SettingsPage";
 import "./App.css";
 
 function App() {
@@ -18,7 +19,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route
-              path="/"
+              path="/learn/:lang"
               element={
                 <ProtectedRoute>
                   <DocumentListPage />
@@ -26,7 +27,7 @@ function App() {
               }
             />
             <Route
-              path="/upload"
+              path="/learn/:lang/upload"
               element={
                 <ProtectedRoute>
                   <UploadPage />
@@ -38,6 +39,22 @@ function App() {
               element={
                 <ProtectedRoute>
                   <ReaderPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute>
+                  <SettingsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <Navigate to={`/learn/${localStorage.getItem("targetLanguage") ?? "es"}`} replace />
                 </ProtectedRoute>
               }
             />

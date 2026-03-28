@@ -486,6 +486,7 @@ input[type="file"] {
 /* ── Reader body (text) ─────────────────────────────────────────────── */
 .reader-body {
   max-width: 66ch;
+  overscroll-behavior-x: none;
 }
 
 .text-renderer {
@@ -718,6 +719,7 @@ input[type="file"] {
   /* Translation panel becomes a fixed bottom sheet on mobile */
   .translation-panel {
     position: fixed;
+    top: auto;
     bottom: 0;
     left: 0;
     right: 0;

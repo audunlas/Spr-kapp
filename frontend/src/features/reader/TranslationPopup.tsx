@@ -8,6 +8,8 @@ interface TranslationPopupProps {
   onClose: () => void;
   vocabLists?: Array<{ id: number; name: string }>;
   onAddToVocabList?: (listId: number) => void;
+  targetLanguage?: string;
+  onCreateAndAdd?: (listName: string) => Promise<void>;
 }
 
 export function TranslationPopup({
@@ -18,9 +20,14 @@ export function TranslationPopup({
   onClose,
   vocabLists,
   onAddToVocabList,
+  targetLanguage: _targetLanguage,
+  onCreateAndAdd,
 }: TranslationPopupProps) {
   const [selectedListId, setSelectedListId] = useState<number | "">("");
   const [addedFeedback, setAddedFeedback] = useState(false);
+  const [showNewList, setShowNewList] = useState(false);
+  const [newListName, setNewListName] = useState("");
+  const [creatingList, setCreatingList] = useState(false);
 
   function handleAdd() {
     if (!selectedListId || !onAddToVocabList) return;
@@ -29,12 +36,25 @@ export function TranslationPopup({
     setTimeout(() => setAddedFeedback(false), 1500);
   }
 
+  async function handleCreateAndAdd() {
+    if (!newListName.trim() || !onCreateAndAdd) return;
+    setCreatingList(true);
+    try {
+      await onCreateAndAdd(newListName.trim());
+      setAddedFeedback(true);
+      setShowNewList(false);
+      setNewListName("");
+      setTimeout(() => setAddedFeedback(false), 1500);
+    } finally {
+      setCreatingList(false);
+    }
+  }
+
   const showVocabRow =
     sourceText &&
     translation &&
     !isLoading &&
-    vocabLists &&
-    vocabLists.length > 0;
+    vocabLists !== undefined;
 
   return (
     <aside className={`translation-panel${sourceText ? " visible" : ""}`}>
@@ -70,21 +90,49 @@ export function TranslationPopup({
           {showVocabRow && (
             <div className="panel-vocab-add" style={{ marginTop: 16, borderTop: "1px solid var(--border)", paddingTop: 12 }}>
               <p className="panel-alt-label">Add to vocab list</p>
-              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <select
-                  value={selectedListId}
-                  onChange={(e) => setSelectedListId(e.target.value === "" ? "" : Number(e.target.value))}
-                  style={{ flex: 1, padding: "4px 8px", borderRadius: 6, border: "1px solid var(--border)", background: "var(--bg)", color: "var(--text)", fontSize: 13 }}
-                  aria-label="Select vocab list"
-                >
-                  <option value="">Select list…</option>
-                  {vocabLists!.map((l) => (
-                    <option key={l.id} value={l.id}>{l.name}</option>
-                  ))}
-                </select>
-                {addedFeedback ? (
-                  <span style={{ color: "#27ae60", fontSize: 13, fontWeight: 600 }}>Added ✓</span>
-                ) : (
+
+              {addedFeedback ? (
+                <span style={{ color: "#27ae60", fontSize: 13, fontWeight: 600 }}>Added ✓</span>
+              ) : showNewList ? (
+                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <input
+                    type="text"
+                    value={newListName}
+                    onChange={(e) => setNewListName(e.target.value)}
+                    placeholder="New list name…"
+                    autoFocus
+                    style={{ flex: 1, padding: "4px 8px", borderRadius: 6, border: "1px solid var(--border)", background: "var(--bg)", color: "var(--text)", fontSize: 13 }}
+                  />
+                  <button
+                    className="btn-read"
+                    onClick={handleCreateAndAdd}
+                    disabled={!newListName.trim() || creatingList}
+                    style={{ padding: "4px 10px", fontSize: 13 }}
+                  >
+                    {creatingList ? "…" : "Create & Add"}
+                  </button>
+                  <button
+                    className="panel-close"
+                    onClick={() => { setShowNewList(false); setNewListName(""); }}
+                    aria-label="Cancel"
+                    style={{ fontSize: 13 }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <select
+                    value={selectedListId}
+                    onChange={(e) => setSelectedListId(e.target.value === "" ? "" : Number(e.target.value))}
+                    style={{ flex: 1, padding: "4px 8px", borderRadius: 6, border: "1px solid var(--border)", background: "var(--bg)", color: "var(--text)", fontSize: 13 }}
+                    aria-label="Select vocab list"
+                  >
+                    <option value="">Select list…</option>
+                    {vocabLists!.map((l) => (
+                      <option key={l.id} value={l.id}>{l.name}</option>
+                    ))}
+                  </select>
                   <button
                     className="btn-read"
                     onClick={handleAdd}
@@ -93,8 +141,16 @@ export function TranslationPopup({
                   >
                     Add
                   </button>
-                )}
-              </div>
+                  <button
+                    className="btn-read"
+                    onClick={() => setShowNewList(true)}
+                    title="Create new list"
+                    style={{ padding: "4px 10px", fontSize: 13 }}
+                  >
+                    + New
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </>

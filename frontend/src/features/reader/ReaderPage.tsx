@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getDocument, getPage, type Document, type Page } from "../../api/documents";
-import { getVocabLists, addEntries, type VocabList } from "../../api/vocab";
+import { getVocabLists, createVocabList, addEntries, type VocabList } from "../../api/vocab";
 import { useAuthContext } from "../auth/AuthContext";
 import { useTranslation } from "../../hooks/useTranslation";
 import { SelectionHandler } from "./SelectionHandler";
@@ -61,6 +61,15 @@ export function ReaderPage() {
     await addEntries(listId, `${panel.translation}:${panel.sourceText}`);
   }
 
+  async function handleCreateAndAdd(listName: string) {
+    if (!panel?.sourceText || !panel?.translation || !document) return;
+    const newList = await createVocabList(listName, document.target_language);
+    await addEntries(newList.id, `${panel.translation}:${panel.sourceText}`);
+    // Refresh vocab lists so the new list appears in the dropdown next time
+    const updated = await getVocabLists(document.target_language);
+    setVocabLists(updated);
+  }
+
   if (isLoading && !page) return <div className="loading">Loading document…</div>;
 
   const backLang = document?.target_language ?? "es";
@@ -111,6 +120,8 @@ export function ReaderPage() {
         onClose={() => setPanel(null)}
         vocabLists={vocabLists.map((l) => ({ id: l.id, name: l.name }))}
         onAddToVocabList={handleAddToVocabList}
+        targetLanguage={document?.target_language}
+        onCreateAndAdd={handleCreateAndAdd}
       />
     </div>
   );

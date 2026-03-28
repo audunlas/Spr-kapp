@@ -4,6 +4,24 @@ import { type VocabEntry, type VocabList, getVocabList } from "../../api/vocab";
 
 type Direction = "target-to-native" | "native-to-target" | "mixed";
 
+const LANGUAGE_CHARS: Record<string, string[]> = {
+  es: ["á", "é", "í", "ó", "ú", "ñ", "ü", "¿", "¡"],
+  fr: ["à", "â", "é", "è", "ê", "ë", "î", "ï", "ô", "ù", "û", "ü", "ç", "œ", "æ"],
+  de: ["ä", "ö", "ü", "Ä", "Ö", "Ü", "ß"],
+  pt: ["á", "â", "ã", "à", "é", "ê", "í", "ó", "ô", "õ", "ú", "ç"],
+  it: ["à", "è", "é", "ì", "í", "î", "ò", "ó", "ù", "ú"],
+  pl: ["ą", "ć", "ę", "ł", "ń", "ó", "ś", "ź", "ż"],
+  nl: ["á", "é", "ë", "ï", "ó", "ö", "ü"],
+  sv: ["å", "ä", "ö"],
+  da: ["å", "æ", "ø"],
+  no: ["å", "æ", "ø"],
+  ru: [],
+  ar: [],
+  zh: [],
+  ja: [],
+  ko: [],
+};
+
 type Screen = "setup" | "practice" | "done";
 
 interface CardResult {
@@ -182,8 +200,22 @@ export function PracticePage() {
               onChange={(e) => setUserAnswer(e.target.value)}
               placeholder="Your answer"
               autoFocus
-              style={{ fontSize: 18, padding: "8px 12px", width: "100%", marginBottom: 12 }}
+              style={{ fontSize: 18, padding: "8px 12px", width: "100%", marginBottom: 8 }}
             />
+            {lang && LANGUAGE_CHARS[lang] && LANGUAGE_CHARS[lang].length > 0 && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12 }}>
+                {LANGUAGE_CHARS[lang].map((ch) => (
+                  <button
+                    key={ch}
+                    type="button"
+                    onClick={() => setUserAnswer((prev) => prev + ch)}
+                    style={{ padding: "4px 10px", fontSize: 16, borderRadius: 6, border: "1px solid var(--border)", background: "var(--surface)", color: "var(--text)", cursor: "pointer" }}
+                  >
+                    {ch}
+                  </button>
+                ))}
+              </div>
+            )}
             <button type="submit" className="btn-primary" disabled={!userAnswer.trim()}>
               Submit
             </button>

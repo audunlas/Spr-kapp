@@ -37,7 +37,7 @@ export function TranslationPopup({
     vocabLists.length > 0;
 
   return (
-    <aside className="translation-panel">
+    <aside className={`translation-panel${sourceText ? " visible" : ""}`}>
       {!sourceText ? (
         <p className="panel-hint">Click any word to see its translation</p>
       ) : (

@@ -26,12 +26,12 @@ export function DocumentListPage() {
     <div className="document-list-page">
       <div className="page-top">
         <h1>{languageName(lang ?? "")}</h1>
-        <Link to={`/learn/${lang}/upload`} className="btn-primary">Upload PDF</Link>
+        <Link to={`/learn/${lang}/upload`} className="btn-primary">Add material</Link>
       </div>
       {documents.length === 0 ? (
         <div className="empty-state">
           <p>No documents yet.</p>
-          <Link to={`/learn/${lang}/upload`} className="btn-primary">Upload your first PDF</Link>
+          <Link to={`/learn/${lang}/upload`} className="btn-primary">Add your first material</Link>
         </div>
       ) : (
         <ul className="doc-list">

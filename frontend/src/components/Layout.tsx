@@ -38,6 +38,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               ))}
             </select>
             <Link to={`/learn/${currentLang}/upload`}>Upload</Link>
+            <Link to={`/learn/${currentLang}/vocab`}>Vocab</Link>
             <Link to="/settings">Settings</Link>
             <span className="nav-user">{user.username}</span>
             <button onClick={handleLogout} className="btn-link">Log out</button>

@@ -4,6 +4,12 @@ from typing import Optional
 from pydantic import BaseModel
 
 
+class TextDocumentRequest(BaseModel):
+    title: str
+    content: str
+    target_language: str = "es"
+
+
 class DocumentOut(BaseModel):
     id: int
     title: str

@@ -12,6 +12,7 @@ function renderLoginPage() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/" element={<div>Home page</div>} />
+          <Route path="/learn/:lang" element={<div>Home page</div>} />
         </Routes>
       </AuthProvider>
     </MemoryRouter>

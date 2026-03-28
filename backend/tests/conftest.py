@@ -9,6 +9,7 @@ from sqlalchemy.pool import StaticPool
 import app.models.document  # noqa: F401
 import app.models.translation  # noqa: F401
 import app.models.user  # noqa: F401
+import app.models.vocab  # noqa: F401
 
 from app.core.database import Base, get_db
 from app.main import app as fastapi_app

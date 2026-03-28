@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getDocument, getPage, type Document, type Page } from "../../api/documents";
+import { getVocabLists, addEntries, type VocabList } from "../../api/vocab";
 import { useAuthContext } from "../auth/AuthContext";
 import { useTranslation } from "../../hooks/useTranslation";
 import { SelectionHandler } from "./SelectionHandler";
@@ -21,12 +22,17 @@ export function ReaderPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [panel, setPanel] = useState<PanelState | null>(null);
+  const [vocabLists, setVocabLists] = useState<VocabList[]>([]);
 
   const { translateText, isLoading: isTranslating } = useTranslation();
 
   useEffect(() => {
     if (!documentId) return;
-    getDocument(Number(documentId)).then(setDocument);
+    getDocument(Number(documentId)).then((doc) => {
+      setDocument(doc);
+      // Fetch vocab lists for this document's language
+      getVocabLists(doc.target_language).then(setVocabLists).catch(() => {});
+    });
   }, [documentId]);
 
   useEffect(() => {
@@ -47,6 +53,12 @@ export function ReaderPage() {
         ? { ...prev, translation: result?.translation ?? null, alternatives: result?.alternatives ?? [] }
         : null
     );
+  }
+
+  async function handleAddToVocabList(listId: number) {
+    if (!panel?.sourceText || !panel?.translation) return;
+    // native:target — native is the translation, target is the source word
+    await addEntries(listId, `${panel.translation}:${panel.sourceText}`);
   }
 
   if (isLoading && !page) return <div className="loading">Loading document…</div>;
@@ -97,6 +109,8 @@ export function ReaderPage() {
         alternatives={panel?.alternatives ?? []}
         isLoading={isTranslating && panel !== null && panel.translation === null}
         onClose={() => setPanel(null)}
+        vocabLists={vocabLists.map((l) => ({ id: l.id, name: l.name }))}
+        onAddToVocabList={handleAddToVocabList}
       />
     </div>
   );

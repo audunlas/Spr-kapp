@@ -45,3 +45,16 @@ export async function getPage(documentId: number, pageNumber: number): Promise<P
   const res = await apiClient.get<Page>(`/documents/${documentId}/pages/${pageNumber}`);
   return res.data;
 }
+
+export async function createTextDocument(
+  title: string,
+  content: string,
+  targetLanguage: string,
+): Promise<Document> {
+  const res = await apiClient.post<Document>("/documents/text", {
+    title,
+    content,
+    target_language: targetLanguage,
+  });
+  return res.data;
+}

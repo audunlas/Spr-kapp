@@ -5,9 +5,9 @@ import { UploadPage } from "../../features/documents/UploadPage";
 
 function renderUploadPage() {
   return render(
-    <MemoryRouter initialEntries={["/upload"]}>
+    <MemoryRouter initialEntries={["/learn/es/upload"]}>
       <Routes>
-        <Route path="/upload" element={<UploadPage />} />
+        <Route path="/learn/:lang/upload" element={<UploadPage />} />
         <Route path="/read/:id" element={<div>Reader page</div>} />
       </Routes>
     </MemoryRouter>
@@ -23,15 +23,15 @@ function selectFile(file: File) {
 describe("UploadPage", () => {
   it("renders upload form with upload button disabled", () => {
     renderUploadPage();
-    expect(screen.getByRole("heading", { name: /upload pdf/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /upload/i })).toBeDisabled();
+    expect(screen.getByRole("heading", { name: /add document/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^upload$/i })).toBeDisabled();
   });
 
   it("enables upload button when file is selected", () => {
     renderUploadPage();
     const file = new File(["%PDF-test"], "test.pdf", { type: "application/pdf" });
     selectFile(file);
-    expect(screen.getByRole("button", { name: /upload/i })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /^upload$/i })).not.toBeDisabled();
   });
 
   it("navigates to reader on successful upload", async () => {

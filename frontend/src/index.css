@@ -520,6 +520,79 @@ input[type="file"] {
   font-size: 15px;
 }
 
+/* ── Vocab pages ────────────────────────────────────────────────────── */
+.vocab-page {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+.vocab-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vocab-entry-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.vocab-entry-table th,
+.vocab-entry-table td {
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.vocab-entry-table th {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+.practice-card {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 40px 32px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-alt);
+  box-shadow: var(--shadow-md);
+  text-align: center;
+}
+
+/* ── Tab bar (Upload page) ───────────────────────────────────────────── */
+.tab-bar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0;
+}
+
+.tab {
+  padding: 8px 20px;
+  border: none;
+  background: none;
+  font: 500 14px var(--sans);
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.tab:hover { color: var(--text); }
+
+.tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
 /* ── Responsive ─────────────────────────────────────────────────────── */
 @media (max-width: 760px) {
   .reader-page {

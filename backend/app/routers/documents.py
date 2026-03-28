@@ -5,7 +5,7 @@ from app.core.database import get_db
 from app.models.document import Document, Page
 from app.models.user import User
 from app.routers.auth import get_current_user
-from app.schemas.document import DocumentOut, PageOut
+from app.schemas.document import DocumentOut, PageOut, TextDocumentRequest
 from app.services.pdf_parser import PDFParser
 
 router = APIRouter(prefix="/documents", tags=["documents"])
@@ -64,6 +64,53 @@ async def upload_document(
 
     for p in raw_pages:
         db.add(Page(document_id=doc.id, page_number=p["page_number"], text_content=p["text_content"]))
+
+    db.commit()
+    db.refresh(doc)
+    return doc
+
+
+@router.post("/text", response_model=DocumentOut, status_code=status.HTTP_201_CREATED)
+def create_text_document(
+    body: TextDocumentRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    # Split content into paragraphs
+    paragraphs = [p.strip() for p in body.content.split("\n\n") if p.strip()]
+
+    # Group paragraphs into ~3000-char chunks
+    pages_text: list[str] = []
+    current_chunk: list[str] = []
+    current_len = 0
+
+    for para in paragraphs:
+        if current_len + len(para) > 3000 and current_chunk:
+            pages_text.append("\n\n".join(current_chunk))
+            current_chunk = [para]
+            current_len = len(para)
+        else:
+            current_chunk.append(para)
+            current_len += len(para)
+
+    if current_chunk:
+        pages_text.append("\n\n".join(current_chunk))
+
+    if not pages_text:
+        pages_text = [""]
+
+    doc = Document(
+        owner_id=current_user.id,
+        title=body.title,
+        target_language=body.target_language,
+        original_filename=None,
+        page_count=len(pages_text),
+    )
+    db.add(doc)
+    db.flush()
+
+    for i, text in enumerate(pages_text, start=1):
+        db.add(Page(document_id=doc.id, page_number=i, text_content=text))
 
     db.commit()
     db.refresh(doc)

@@ -8,6 +8,9 @@ import { DocumentListPage } from "./features/documents/DocumentListPage";
 import { UploadPage } from "./features/documents/UploadPage";
 import { ReaderPage } from "./features/reader/ReaderPage";
 import { SettingsPage } from "./features/settings/SettingsPage";
+import { VocabListsPage } from "./features/vocab/VocabListsPage";
+import { VocabListPage } from "./features/vocab/VocabListPage";
+import { PracticePage } from "./features/vocab/PracticePage";
 import "./App.css";
 
 function App() {
@@ -31,6 +34,30 @@ function App() {
               element={
                 <ProtectedRoute>
                   <UploadPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/learn/:lang/vocab"
+              element={
+                <ProtectedRoute>
+                  <VocabListsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/learn/:lang/vocab/:listId"
+              element={
+                <ProtectedRoute>
+                  <VocabListPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/learn/:lang/vocab/:listId/practice"
+              element={
+                <ProtectedRoute>
+                  <PracticePage />
                 </ProtectedRoute>
               }
             />

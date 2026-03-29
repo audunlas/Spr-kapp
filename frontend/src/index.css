@@ -510,6 +510,12 @@ input[type="file"] {
   background: var(--accent-dim);
   color: var(--accent);
 }
+.token-anchor {
+  background: var(--accent-dim);
+  color: var(--accent);
+  outline: 1px solid var(--accent);
+  outline-offset: 1px;
+}
 
 .punct { color: inherit; }
 

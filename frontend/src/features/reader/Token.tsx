@@ -2,10 +2,11 @@ import { useRef } from "react";
 
 interface TokenProps {
   word: string;
+  isAnchor?: boolean;
   onClick: (word: string, rect: DOMRect) => void;
 }
 
-export function Token({ word, onClick }: TokenProps) {
+export function Token({ word, isAnchor, onClick }: TokenProps) {
   const ref = useRef<HTMLSpanElement>(null);
 
   function handleClick() {
@@ -17,7 +18,7 @@ export function Token({ word, onClick }: TokenProps) {
   return (
     <span
       ref={ref}
-      className="token"
+      className={`token${isAnchor ? " token-anchor" : ""}`}
       data-word={word}
       onClick={handleClick}
       role="button"

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getDocument, getPage, type Document, type Page } from "../../api/documents";
 import { getVocabLists, createVocabList, addEntries, type VocabList } from "../../api/vocab";
@@ -14,6 +14,19 @@ interface PanelState {
   alternatives: string[];
 }
 
+/** Extracts clean words in order from text, matching TextRenderer's tokenization. */
+function extractWords(text: string): string[] {
+  const words: string[] = [];
+  for (const para of text.split(/\n{2,}/)) {
+    for (const chunk of para.split(/(\s+)/)) {
+      if (/^\s+$/.test(chunk) || !chunk) continue;
+      const match = chunk.match(/^[^a-zA-ZÀ-ÿ\d]*([a-zA-ZÀ-ÿ\d][a-zA-ZÀ-ÿ\d'-]*)[^a-zA-ZÀ-ÿ\d]*$/);
+      if (match) words.push(match[1]);
+    }
+  }
+  return words;
+}
+
 export function ReaderPage() {
   const { documentId } = useParams<{ documentId: string }>();
   const { user } = useAuthContext();
@@ -23,6 +36,8 @@ export function ReaderPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [panel, setPanel] = useState<PanelState | null>(null);
   const [vocabLists, setVocabLists] = useState<VocabList[]>([]);
+  const [anchorIdx, setAnchorIdx] = useState<number | null>(null);
+  const wordListRef = useRef<string[]>([]);
 
   const { translateText, isLoading: isTranslating } = useTranslation();
 
@@ -30,7 +45,6 @@ export function ReaderPage() {
     if (!documentId) return;
     getDocument(Number(documentId)).then((doc) => {
       setDocument(doc);
-      // Fetch vocab lists for this document's language
       getVocabLists(doc.target_language).then(setVocabLists).catch(() => {});
     });
   }, [documentId]);
@@ -39,7 +53,10 @@ export function ReaderPage() {
     if (!documentId) return;
     setIsLoading(true);
     getPage(Number(documentId), currentPage)
-      .then(setPage)
+      .then((p) => {
+        setPage(p);
+        if (p?.text_content) wordListRef.current = extractWords(p.text_content);
+      })
       .finally(() => setIsLoading(false));
   }, [documentId, currentPage]);
 
@@ -55,9 +72,33 @@ export function ReaderPage() {
     );
   }
 
+  function handleTokenClick(idx: number, word: string) {
+    if (anchorIdx === null) {
+      // First tap: translate word and mark as anchor
+      setAnchorIdx(idx);
+      showTranslation(word);
+    } else if (anchorIdx === idx) {
+      // Tap same word: deselect
+      setAnchorIdx(null);
+      setPanel(null);
+    } else {
+      // Tap a different word: translate phrase from anchor to here
+      const words = wordListRef.current;
+      const from = Math.min(anchorIdx, idx);
+      const to = Math.max(anchorIdx, idx);
+      const phrase = words.slice(from, to + 1).join(" ");
+      setAnchorIdx(null);
+      showTranslation(phrase);
+    }
+  }
+
+  function handleClose() {
+    setPanel(null);
+    setAnchorIdx(null);
+  }
+
   async function handleAddToVocabList(listId: number) {
     if (!panel?.sourceText || !panel?.translation) return;
-    // native:target — native is the translation, target is the source word
     await addEntries(listId, `${panel.translation}:${panel.sourceText}`);
   }
 
@@ -65,7 +106,6 @@ export function ReaderPage() {
     if (!panel?.sourceText || !panel?.translation || !document) return;
     const newList = await createVocabList(listName, document.target_language);
     await addEntries(newList.id, `${panel.translation}:${panel.sourceText}`);
-    // Refresh vocab lists so the new list appears in the dropdown next time
     const updated = await getVocabLists(document.target_language);
     setVocabLists(updated);
   }
@@ -103,8 +143,12 @@ export function ReaderPage() {
 
         <div className="reader-body">
           {page?.text_content ? (
-            <SelectionHandler onSelect={(text) => showTranslation(text)}>
-              <TextRenderer text={page.text_content} onWordClick={(word) => showTranslation(word)} />
+            <SelectionHandler onSelect={(text) => { setAnchorIdx(null); showTranslation(text); }}>
+              <TextRenderer
+                text={page.text_content}
+                onWordClick={(idx, word) => handleTokenClick(idx, word)}
+                anchorIdx={anchorIdx}
+              />
             </SelectionHandler>
           ) : (
             <p className="empty-page">No text found on this page.</p>
@@ -117,7 +161,7 @@ export function ReaderPage() {
         translation={panel?.translation ?? null}
         alternatives={panel?.alternatives ?? []}
         isLoading={isTranslating && panel !== null && panel.translation === null}
-        onClose={() => setPanel(null)}
+        onClose={handleClose}
         vocabLists={vocabLists.map((l) => ({ id: l.id, name: l.name }))}
         onAddToVocabList={handleAddToVocabList}
         targetLanguage={document?.target_language}

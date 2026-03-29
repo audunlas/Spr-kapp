@@ -14,6 +14,8 @@ import { PracticePage } from "./features/vocab/PracticePage";
 import { MyClassesPage } from "./features/classes/MyClassesPage";
 import { ClassManagePage } from "./features/classes/ClassManagePage";
 import { ClassViewPage } from "./features/classes/ClassViewPage";
+import { ExerciseEditPage } from "./features/exercises/ExerciseEditPage";
+import { ExercisePlayPage } from "./features/exercises/ExercisePlayPage";
 import "./App.css";
 
 function App() {
@@ -89,6 +91,23 @@ function App() {
               }
             />
             <Route path="/class/:shareCode" element={<ClassViewPage />} />
+            <Route
+              path="/classes/:classId/exercises/new"
+              element={
+                <ProtectedRoute>
+                  <ExerciseEditPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/exercises/:exerciseId/edit"
+              element={
+                <ProtectedRoute>
+                  <ExerciseEditPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/exercises/:exerciseId/play" element={<ExercisePlayPage />} />
             <Route
               path="/settings"
               element={

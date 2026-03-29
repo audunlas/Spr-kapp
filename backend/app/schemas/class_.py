@@ -4,6 +4,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 from app.schemas.document import DocumentOut
+from app.schemas.exercise import ExerciseRef
 from app.schemas.vocab import VocabListOut
 
 
@@ -34,5 +35,6 @@ class ClassOut(BaseModel):
     created_at: datetime
     documents: list[DocumentOut] = []
     vocab_lists: list[VocabListOut] = []
+    exercises: list[ExerciseRef] = []
 
     model_config = {"from_attributes": True}

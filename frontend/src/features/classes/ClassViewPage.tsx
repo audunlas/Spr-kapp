@@ -79,7 +79,26 @@ export function ClassViewPage() {
         </section>
       )}
 
-      {cls.documents.length === 0 && cls.vocab_lists.length === 0 && (
+      {/* Grammar exercises */}
+      {cls.exercises.length > 0 && (
+        <section style={{ marginTop: cls.documents.length > 0 || cls.vocab_lists.length > 0 ? 0 : 0 }}>
+          <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 12 }}>Grammar exercises</h2>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {cls.exercises.map((ex) => (
+              <Link
+                key={ex.id}
+                to={`/exercises/${ex.id}/play?back=/class/${shareCode}`}
+                style={{ display: "flex", flexDirection: "column", gap: 4, padding: "12px 16px", borderRadius: 10, border: "1px solid var(--border)", background: "var(--surface)", textDecoration: "none", color: "var(--text)" }}
+              >
+                <span style={{ fontWeight: 500 }}>{ex.title}</span>
+                <span style={{ color: "var(--text-muted)", fontSize: 13 }}>{ex.prompt}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {cls.documents.length === 0 && cls.vocab_lists.length === 0 && cls.exercises.length === 0 && (
         <p style={{ color: "var(--text-muted)" }}>This class has no content yet.</p>
       )}
     </div>

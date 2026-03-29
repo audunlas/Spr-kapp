@@ -517,6 +517,41 @@ input[type="file"] {
   outline-offset: 1px;
 }
 
+/* ── Grammar exercise tokens ─────────────────────────────────────────── */
+.ex-token {
+  cursor: pointer;
+  border-radius: 3px;
+  padding: 0 2px;
+  transition: background 0.1s, color 0.1s;
+}
+.ex-token:hover { background: var(--accent-dim); }
+.ex-token-marked {
+  background: #fef3c7;
+  color: #92400e;
+  outline: 1px solid #f59e0b;
+  outline-offset: 1px;
+}
+.ex-token-selected {
+  background: var(--accent-dim);
+  color: var(--accent);
+  outline: 1px solid var(--accent);
+  outline-offset: 1px;
+}
+.ex-token-correct {
+  background: #dcfce7;
+  color: #166534;
+}
+.ex-token-wrong {
+  background: #fee2e2;
+  color: #991b1b;
+}
+.ex-token-missed {
+  background: #fef3c7;
+  color: #92400e;
+  outline: 1px dashed #f59e0b;
+  outline-offset: 1px;
+}
+
 .punct { color: inherit; }
 
 .empty-page {

@@ -32,3 +32,5 @@ class Class(Base):
 
     documents = relationship("Document", secondary=class_documents_table, lazy="selectin")
     vocab_lists = relationship("VocabList", secondary=class_vocab_lists_table, lazy="selectin")
+    exercises = relationship("GrammarExercise", back_populates="class_", lazy="selectin",
+                             cascade="all, delete-orphan", order_by="GrammarExercise.id")

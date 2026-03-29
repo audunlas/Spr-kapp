@@ -10,6 +10,7 @@ import {
   type ClassRoom,
 } from "../../api/classes";
 import { getDocuments, type Document } from "../../api/documents";
+import { deleteExercise } from "../../api/exercises";
 import { getVocabLists, type VocabList } from "../../api/vocab";
 
 export function ClassManagePage() {
@@ -190,6 +191,42 @@ export function ClassManagePage() {
                 <option key={l.id} value={l.id}>{l.name}</option>
               ))}
             </select>
+          </div>
+        )}
+      </section>
+
+      {/* Grammar exercises */}
+      <section style={{ marginTop: 28 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+          <h2 style={{ fontSize: 16, fontWeight: 600, margin: 0 }}>Grammar exercises</h2>
+          <Link to={`/classes/${cls.id}/exercises/new`} className="btn-read" style={{ fontSize: 13 }}>+ New exercise</Link>
+        </div>
+        {cls.exercises.length === 0 ? (
+          <p style={{ color: "var(--text-muted)", fontSize: 14 }}>None yet.</p>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {cls.exercises.map((ex) => (
+              <div key={ex.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--surface)" }}>
+                <div>
+                  <span style={{ fontSize: 14, fontWeight: 500 }}>{ex.title}</span>
+                  <span style={{ fontSize: 12, color: "var(--text-muted)", marginLeft: 8 }}>{ex.prompt}</span>
+                </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <Link to={`/exercises/${ex.id}/edit`} className="btn-read" style={{ fontSize: 12 }}>Edit</Link>
+                  <button
+                    className="btn-read"
+                    style={{ fontSize: 12, color: "var(--danger)" }}
+                    onClick={async () => {
+                      if (!confirm("Delete this exercise?")) return;
+                      await deleteExercise(ex.id);
+                      setCls((prev) => prev ? { ...prev, exercises: prev.exercises.filter((e) => e.id !== ex.id) } : prev);
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </section>

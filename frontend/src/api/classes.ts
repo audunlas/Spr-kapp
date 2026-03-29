@@ -2,6 +2,12 @@ import { apiClient } from "./client";
 import type { Document } from "./documents";
 import type { VocabList } from "./vocab";
 
+export interface ExerciseRef {
+  id: number;
+  title: string;
+  prompt: string;
+}
+
 export interface ClassRoom {
   id: number;
   name: string;
@@ -11,6 +17,7 @@ export interface ClassRoom {
   created_at: string;
   documents: Document[];
   vocab_lists: VocabList[];
+  exercises: ExerciseRef[];
 }
 
 export async function getMyClasses(): Promise<ClassRoom[]> {

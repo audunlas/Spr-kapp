@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { getDocument, getPage, type Document, type Page } from "../../api/documents";
 import { getVocabLists, createVocabList, addEntries, type VocabList } from "../../api/vocab";
 import { useAuthContext } from "../auth/AuthContext";
@@ -29,6 +29,8 @@ function extractWords(text: string): string[] {
 
 export function ReaderPage() {
   const { documentId } = useParams<{ documentId: string }>();
+  const [searchParams] = useSearchParams();
+  const backUrl = searchParams.get("back");
   const { user } = useAuthContext();
   const [document, setDocument] = useState<Document | null>(null);
   const [page, setPage] = useState<Page | null>(null);
@@ -118,7 +120,9 @@ export function ReaderPage() {
     <div className="reader-page">
       <div className="reader-main">
         <div className="reader-header">
-          <Link to={`/learn/${backLang}`} className="back-link">← My Documents</Link>
+          <Link to={backUrl ?? `/learn/${backLang}`} className="back-link">
+            ← {backUrl ? "Back to class" : "My Documents"}
+          </Link>
           {document && <h1 className="reader-title">{document.title}</h1>}
           {document && (
             <div className="page-nav">

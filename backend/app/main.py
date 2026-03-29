@@ -5,11 +5,12 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.core.database import create_tables
-from app.routers import auth, documents, seeding, translations, vocab
+from app.routers import auth, classes, documents, seeding, translations, vocab
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    import app.models.class_  # noqa: F401
     import app.models.document  # noqa: F401
     import app.models.translation  # noqa: F401
     import app.models.user  # noqa: F401
@@ -33,6 +34,7 @@ app.include_router(auth.router)
 app.include_router(documents.router)
 app.include_router(translations.router)
 app.include_router(vocab.router)
+app.include_router(classes.router)
 app.include_router(seeding.router)
 
 

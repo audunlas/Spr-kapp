@@ -11,6 +11,9 @@ import { SettingsPage } from "./features/settings/SettingsPage";
 import { VocabListsPage } from "./features/vocab/VocabListsPage";
 import { VocabListPage } from "./features/vocab/VocabListPage";
 import { PracticePage } from "./features/vocab/PracticePage";
+import { MyClassesPage } from "./features/classes/MyClassesPage";
+import { ClassManagePage } from "./features/classes/ClassManagePage";
+import { ClassViewPage } from "./features/classes/ClassViewPage";
 import "./App.css";
 
 function App() {
@@ -69,6 +72,23 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/classes"
+              element={
+                <ProtectedRoute>
+                  <MyClassesPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/classes/:classId/manage"
+              element={
+                <ProtectedRoute>
+                  <ClassManagePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/class/:shareCode" element={<ClassViewPage />} />
             <Route
               path="/settings"
               element={

@@ -1,13 +1,13 @@
 WELCOME_TEXT_EN = """\
 Welcome to Språkapp
 
-This app helps you learn languages by reading real texts. Tap any word to see its translation. To translate a phrase, tap the first word — it will be highlighted — then tap the last word of the phrase. On desktop you can also click and drag across words.
+This app helps you learn languages by reading real texts. Tap any word to see its translation. To translate a phrase, tap the first word — it will be highlighted — then tap the last word of the phrase. On desktop you can also click and drag to select a phrase.
 
 You can upload PDF books and articles, or paste text directly. Everything is saved so you can come back and continue reading anytime.
 
 To save words you want to remember, tap a word, wait for the translation to appear, and add it to a vocabulary list. Then go to the Vocab section to practice with flashcards.
 
-This is your first document. Try tapping a word, then tap a nearby word to translate a phrase!
+This is your first document. Try clicking a word, then click a nearby word to translate a phrase!
 """
 
 # Basic vocabulary: (English native, target word)

@@ -124,7 +124,14 @@ export function TranslationPopup({
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                   <select
                     value={selectedListId}
-                    onChange={(e) => setSelectedListId(e.target.value === "" ? "" : Number(e.target.value))}
+                    onChange={(e) => {
+                      if (e.target.value === "new") {
+                        setShowNewList(true);
+                        setSelectedListId("");
+                      } else {
+                        setSelectedListId(e.target.value === "" ? "" : Number(e.target.value));
+                      }
+                    }}
                     style={{ flex: 1, padding: "4px 8px", borderRadius: 6, border: "1px solid var(--border)", background: "var(--bg)", color: "var(--text)", fontSize: 13 }}
                     aria-label="Select vocab list"
                   >
@@ -132,6 +139,7 @@ export function TranslationPopup({
                     {vocabLists!.map((l) => (
                       <option key={l.id} value={l.id}>{l.name}</option>
                     ))}
+                    <option value="new">+ New vocab list</option>
                   </select>
                   <button
                     className="btn-read"
@@ -140,14 +148,6 @@ export function TranslationPopup({
                     style={{ padding: "4px 10px", fontSize: 13 }}
                   >
                     Add
-                  </button>
-                  <button
-                    className="btn-read"
-                    onClick={() => setShowNewList(true)}
-                    title="Create new list"
-                    style={{ padding: "4px 10px", fontSize: 13 }}
-                  >
-                    + New
                   </button>
                 </div>
               )}

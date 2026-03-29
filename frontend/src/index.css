@@ -751,6 +751,120 @@ input[type="file"] {
   background: var(--accent-dim);
 }
 
+/* ── Help / docs page ───────────────────────────────────────────────── */
+.help-page {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+.help-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-head);
+  margin-bottom: 24px;
+}
+
+.help-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 48px;
+  padding: 16px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.help-nav a {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+.help-nav a:hover { background: var(--accent-dim); }
+
+.help-section {
+  margin-bottom: 52px;
+  scroll-margin-top: 24px;
+}
+
+.help-section h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-head);
+  margin: 0 0 16px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--border);
+}
+
+.help-section h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-head);
+  margin: 24px 0 8px;
+}
+
+.help-section p,
+.help-section li {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text);
+  margin: 0 0 10px;
+}
+
+.help-section ol,
+.help-section ul {
+  padding-left: 22px;
+  margin: 0 0 12px;
+}
+
+.help-section code {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 13px;
+  font-family: monospace;
+}
+
+.help-code {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-family: monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 0 0 12px;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+.help-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.help-table th {
+  text-align: left;
+  padding: 8px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.help-table td {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+}
+
 /* ── Responsive ─────────────────────────────────────────────────────── */
 @media (max-width: 760px) {
   .reader-page {

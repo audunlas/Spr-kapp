@@ -40,6 +40,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <Link to={`/learn/${currentLang}/upload`}>Upload</Link>
             <Link to={`/learn/${currentLang}/vocab`}>Vocab</Link>
             <Link to="/classes">Classes</Link>
+            <Link to="/help">Help</Link>
             <Link to="/settings">Settings</Link>
             <span className="nav-divider" aria-hidden="true" />
             <span className="nav-user">{user.username}</span>

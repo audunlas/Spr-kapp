@@ -16,6 +16,7 @@ import { ClassManagePage } from "./features/classes/ClassManagePage";
 import { ClassViewPage } from "./features/classes/ClassViewPage";
 import { ExerciseEditPage } from "./features/exercises/ExerciseEditPage";
 import { ExercisePlayPage } from "./features/exercises/ExercisePlayPage";
+import { HelpPage } from "./features/help/HelpPage";
 import "./App.css";
 
 function App() {
@@ -108,6 +109,7 @@ function App() {
               }
             />
             <Route path="/exercises/:exerciseId/play" element={<ExercisePlayPage />} />
+            <Route path="/help" element={<HelpPage />} />
             <Route
               path="/settings"
               element={

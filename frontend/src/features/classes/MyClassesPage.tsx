@@ -2,8 +2,11 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { createClass, deleteClass, getMyClasses, type ClassRoom } from "../../api/classes";
 
+interface JoinedClass { code: string; name: string; }
+
 export function MyClassesPage() {
   const [classes, setClasses] = useState<ClassRoom[]>([]);
+  const [joinedClasses, setJoinedClasses] = useState<JoinedClass[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [newName, setNewName] = useState("");
@@ -12,7 +15,13 @@ export function MyClassesPage() {
   const [copied, setCopied] = useState<number | null>(null);
 
   useEffect(() => {
-    getMyClasses().then(setClasses).finally(() => setIsLoading(false));
+    getMyClasses().then((myClasses) => {
+      setClasses(myClasses);
+      // Load joined classes from localStorage, excluding ones the user owns
+      const ownedCodes = new Set(myClasses.map((c) => c.share_code));
+      const stored: JoinedClass[] = JSON.parse(localStorage.getItem("joinedClasses") ?? "[]");
+      setJoinedClasses(stored.filter((j) => !ownedCodes.has(j.code)));
+    }).finally(() => setIsLoading(false));
   }, []);
 
   async function handleCreate(e: React.FormEvent) {
@@ -106,6 +115,32 @@ export function MyClassesPage() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {joinedClasses.length > 0 && (
+        <div style={{ marginTop: 40 }}>
+          <h2 style={{ fontSize: 17, fontWeight: 600, marginBottom: 12 }}>Joined classes</h2>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {joinedClasses.map((j) => (
+              <div key={j.code} className="card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <Link to={`/class/${j.code}`} style={{ fontWeight: 500, textDecoration: "none", color: "var(--text)" }}>
+                  {j.name}
+                </Link>
+                <button
+                  className="btn-read"
+                  style={{ fontSize: 12, color: "var(--text-muted)" }}
+                  onClick={() => {
+                    const updated = joinedClasses.filter((c) => c.code !== j.code);
+                    setJoinedClasses(updated);
+                    localStorage.setItem("joinedClasses", JSON.stringify(updated));
+                  }}
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

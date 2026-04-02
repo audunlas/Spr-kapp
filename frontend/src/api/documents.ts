@@ -55,6 +55,16 @@ export async function getPage(documentId: number, pageNumber: number): Promise<P
   return res.data;
 }
 
+export async function getClassDocument(shareCode: string, docId: number): Promise<Document> {
+  const res = await apiClient.get<Document>(`/classes/join/${shareCode}/documents/${docId}`);
+  return res.data;
+}
+
+export async function getClassPage(shareCode: string, docId: number, pageNumber: number): Promise<Page> {
+  const res = await apiClient.get<Page>(`/classes/join/${shareCode}/documents/${docId}/pages/${pageNumber}`);
+  return res.data;
+}
+
 export async function createTextDocument(
   title: string,
   content: string,

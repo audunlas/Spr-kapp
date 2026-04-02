@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
-import { getDocument, getPage, type Document, type Page } from "../../api/documents";
+import { getDocument, getPage, getClassDocument, getClassPage, type Document, type Page } from "../../api/documents";
 import { getVocabLists, createVocabList, addEntries, type VocabList } from "../../api/vocab";
 import { useAuthContext } from "../auth/AuthContext";
 import { useTranslation } from "../../hooks/useTranslation";
@@ -31,6 +31,7 @@ export function ReaderPage() {
   const { documentId } = useParams<{ documentId: string }>();
   const [searchParams] = useSearchParams();
   const backUrl = searchParams.get("back");
+  const classCode = searchParams.get("classCode");
   const { user } = useAuthContext();
   const [document, setDocument] = useState<Document | null>(null);
   const [page, setPage] = useState<Page | null>(null);
@@ -45,22 +46,28 @@ export function ReaderPage() {
 
   useEffect(() => {
     if (!documentId) return;
-    getDocument(Number(documentId)).then((doc) => {
+    const fetch = classCode
+      ? getClassDocument(classCode, Number(documentId))
+      : getDocument(Number(documentId));
+    fetch.then((doc) => {
       setDocument(doc);
       getVocabLists(doc.target_language).then(setVocabLists).catch(() => {});
     });
-  }, [documentId]);
+  }, [documentId, classCode]);
 
   useEffect(() => {
     if (!documentId) return;
     setIsLoading(true);
-    getPage(Number(documentId), currentPage)
+    const fetch = classCode
+      ? getClassPage(classCode, Number(documentId), currentPage)
+      : getPage(Number(documentId), currentPage);
+    fetch
       .then((p) => {
         setPage(p);
         if (p?.text_content) wordListRef.current = extractWords(p.text_content);
       })
       .finally(() => setIsLoading(false));
-  }, [documentId, currentPage]);
+  }, [documentId, currentPage, classCode]);
 
   async function showTranslation(text: string) {
     const sourceLang = document?.target_language ?? "es";

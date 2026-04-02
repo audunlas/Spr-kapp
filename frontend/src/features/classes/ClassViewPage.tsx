@@ -11,7 +11,17 @@ export function ClassViewPage() {
   useEffect(() => {
     if (!shareCode) return;
     getClassByShareCode(shareCode)
-      .then(setCls)
+      .then((c) => {
+        setCls(c);
+        // Persist so user can find this class again from the Classes page
+        const stored: Array<{ code: string; name: string }> = JSON.parse(
+          localStorage.getItem("joinedClasses") ?? "[]"
+        );
+        if (!stored.find((s) => s.code === c.share_code)) {
+          stored.push({ code: c.share_code, name: c.name });
+          localStorage.setItem("joinedClasses", JSON.stringify(stored));
+        }
+      })
       .catch(() => setNotFound(true))
       .finally(() => setIsLoading(false));
   }, [shareCode]);
@@ -35,7 +45,7 @@ export function ClassViewPage() {
             {cls.documents.map((doc) => (
               <Link
                 key={doc.id}
-                to={`/read/${doc.id}?back=/class/${shareCode}`}
+                to={`/read/${doc.id}?back=/class/${shareCode}&classCode=${shareCode}`}
                 style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", borderRadius: 10, border: "1px solid var(--border)", background: "var(--surface)", textDecoration: "none", color: "var(--text)" }}
               >
                 <span style={{ fontWeight: 500 }}>{doc.title}</span>

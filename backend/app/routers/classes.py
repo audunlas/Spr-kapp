@@ -5,8 +5,9 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.models.class_ import Class
-from app.models.document import Document
+from app.models.document import Document, Page
 from app.models.vocab import VocabList
+from app.schemas.document import DocumentOut, PageOut
 from app.models.user import User
 from app.routers.auth import get_current_user
 from app.schemas.class_ import (
@@ -156,6 +157,31 @@ def add_vocab_list(
         db.commit()
         db.refresh(cls)
     return cls
+
+
+@router.get("/join/{share_code}/documents/{doc_id}", response_model=DocumentOut)
+def get_class_document(share_code: str, doc_id: int, db: Session = Depends(get_db)):
+    cls = db.query(Class).filter(Class.share_code == share_code).first()
+    if not cls:
+        raise HTTPException(status_code=404, detail="Class not found")
+    doc = db.get(Document, doc_id)
+    if not doc or doc not in cls.documents:
+        raise HTTPException(status_code=404, detail="Document not found in this class")
+    return doc
+
+
+@router.get("/join/{share_code}/documents/{doc_id}/pages/{page_num}", response_model=PageOut)
+def get_class_document_page(share_code: str, doc_id: int, page_num: int, db: Session = Depends(get_db)):
+    cls = db.query(Class).filter(Class.share_code == share_code).first()
+    if not cls:
+        raise HTTPException(status_code=404, detail="Class not found")
+    doc = db.get(Document, doc_id)
+    if not doc or doc not in cls.documents:
+        raise HTTPException(status_code=404, detail="Document not found in this class")
+    page = db.query(Page).filter(Page.document_id == doc_id, Page.page_number == page_num).first()
+    if not page:
+        raise HTTPException(status_code=404, detail="Page not found")
+    return page
 
 
 @router.delete("/{class_id}/vocab-lists/{list_id}", response_model=ClassOut)

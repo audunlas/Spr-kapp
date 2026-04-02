@@ -40,7 +40,11 @@ class TranslationService:
             return cached.translated_text, [], True
 
         if settings.deepl_api_key:
-            translated, alternatives = await self._call_deepl(key, source_lang, target_lang)
+            try:
+                translated, alternatives = await self._call_deepl(key, source_lang, target_lang)
+            except Exception as e:
+                print(f"DeepL failed ({type(e).__name__}: {e}), falling back to MyMemory")
+                translated, alternatives = await self._call_mymemory(key, source_lang, target_lang)
         else:
             translated, alternatives = await self._call_mymemory(key, source_lang, target_lang)
 
